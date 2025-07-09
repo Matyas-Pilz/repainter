@@ -49,6 +49,8 @@ local function is_degrotate_node(pos)
     local def = minetest.registered_nodes[node.name]
     return def and def.paramtype2 == "degrotate" or def.paramtype2 == "colordegrotate"
 end
+
+repainter_tool_defs = {}
 --
 -- FUNCTION REGISTRATION
 -- 
@@ -80,7 +82,12 @@ minetest.register_tool("repainter:repainter_"..rtype, {
 
         return itemstack
     end,
-})
+    table.insert(repainter_tool_defs, {
+        tooltype = "repainter",
+        rtype = rtype,
+        color = rtype,
+    })
+        })
 end
 
 function repainter_register_rotator(rtype,rrtype,num1,num2,funk)
@@ -111,7 +118,12 @@ minetest.register_tool("repainter:rotator_"..rtype, {
 
         return itemstack
     end,
-})
+    table.insert(repainter_tool_defs, {
+        tooltype = "repainter",
+        rtype = rtype,
+        color = rtype,
+    })
+        })
 end
 
 --
