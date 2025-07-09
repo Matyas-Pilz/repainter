@@ -10,3 +10,9 @@ In variants:
 * D - (color)degrotate - yellow
 
 This mod does not include any palette, it uses palettes specified for each node.
+
+Crafting actually supported for Mineclonia and Minetest game based games
+
+Credits:
+* MatyasP - mod author
+* bgstack15 - creator of crafting
