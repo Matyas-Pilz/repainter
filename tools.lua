@@ -80,7 +80,12 @@ minetest.register_tool("repainter:repainter_"..rtype, {
 
         return itemstack
     end,
-})
+    table.insert(tool_defs, {
+        tooltype = "repainter",
+        rtype = rtype,
+        color = rtype,
+    })
+        })
 end
 
 function repainter_register_rotator(rtype,rrtype,num1,num2,funk)
@@ -111,7 +116,12 @@ minetest.register_tool("repainter:rotator_"..rtype, {
 
         return itemstack
     end,
-})
+    table.insert(tool_defs, {
+        tooltype = "rotator",
+        rtype = rtype,
+        color = rtype,
+    })
+        })
 end
 
 --
