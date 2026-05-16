@@ -26,7 +26,6 @@ local function is_colorfacedir_node(pos)
     local def = core.registered_nodes[node.name]
     return def and def.paramtype2 == "colorfacedir"
 end
-
 local function is_facedir_node(pos)
     local node = core.get_node_or_nil(pos)
     if not node then return false end
@@ -141,7 +140,7 @@ function repainter_register_repainter(rtype,rrtype,num1,num2,num3,funk)
 	end
 end
 
-function repainter_register_rotator(rtype,rrtype,num1,num2,funk)
+function repainter_register_rotator(rtype,rrtype,num1,num2,num3,funk)
     core.register_tool("repainter:rotator_"..rtype, {
         description = "Rotator "..rrtype,
         inventory_image = "repainter_rotator_"..rtype..".png",
@@ -180,21 +179,109 @@ function repainter_register_rotator(rtype,rrtype,num1,num2,funk)
         })
     })
 
-    
+	-- crafting by bgstack15
+	if has_xcompat then
+    core.register_craft({
+        output = "repainter:rotator_"..rtype,
+        recipe = {
+            { xcompat.materials["steel_ingot"] },
+            { wool_name..color_assignment[rtype] },
+            { xcompat.materials["steel_ingot"] }
+        }
+    })
+	elseif has_mcl_core then
+		core.register_craft({
+			output = "repainter:rotator_"..rtype,
+			recipe = {
+				{ "mcl_core:iron_ingot" },
+				{ "mcl_wool:"..color_assignment[rtype] },
+				{ "mcl_core:iron_ingot" }
+			}
+		})
+	else
+		-- default
+		core.register_craft({
+			output = "repainter:rotator_"..rtype,
+			recipe = {
+				{ "default:steel_ingot" },
+				{ "wool:"..color_assignment[rtype] },
+				{ "default:steel_ingot" }
+			}
+		})
+	end
 end
+
+-- --------
+-- Zerorepainter, Zerotator
+-- --------
+
+core.register_tool("repainter:zerorepainter", {
+	description = "Repainter to color 0",
+	inventory_image = "repainter_zerorepainter.png",
+
+	on_use = function(itemstack, user, pointed_thing)
+		if pointed_thing.type ~= "node" then return itemstack end
+		local pos = pointed_thing.under
+		local node = core.get_node_or_nil(pos)
+		if not node then return false end
+		local def = core.registered_nodes[node.name]
+		local op2 = node.param2
+		local np2
+		
+		if def.paramtype2 == ("colorfacedir" or "facedir") then np2 = op2 % 32
+		elseif def.paramtype2 == ("color4dir" or "4dir") then np2 = op2 % 4
+		elseif def.paramtype2 == ("colorwallmounted" or "wallmounted") then np2 = op2 % 8
+		elseif def.paramtype2 == ("colordegrotate" or "degrotate") then np2 = op2 % 32
+		end
+
+		local node = core.get_node(pos)
+		node.param2 = np2
+		core.swap_node(pos, node)
+
+		return itemstack
+	end,
+})
+
+core.register_tool("repainter:zerotator", {
+	description = "Rotator to rotation 0",
+	inventory_image = "repainter_zerotator.png",
+	
+		on_use = function(itemstack, user, pointed_thing)
+		if pointed_thing.type ~= "node" then return itemstack end
+		local pos = pointed_thing.under
+		local node = core.get_node_or_nil(pos)
+		if not node then return false end
+		local def = core.registered_nodes[node.name]
+		local op2 = node.param2
+		local np2
+
+		-- old problematic:
+		-- if def.paramtype2 == ("colorfacedir" or "facedir") then np2 = math.floor(op2 / 32)		
+		if def.paramtype2 == ("colorfacedir" or "facedir") then np2 = op2-op2%32
+		elseif def.paramtype2 == ("color4dir" or "4dir") then np2 = op2-op2%4
+		elseif def.paramtype2 == ("colorwallmounted" or "wallmounted") then np2 = op2-op2%8
+		elseif def.paramtype2 == ("colordegrotate" or "degrotate") then np2 = op2-op2%32
+		end
+
+		local node = core.get_node(pos)
+		node.param2 = np2
+		core.swap_node(pos, node)
+
+		return itemstack
+	end,
+})
 
 --
 -- TOOL FUNCTION
 -- 
 --rotator_register_repainter(rtype,rrtype,num1,num2,funk)
-repainter_register_repainter("a","A - (color)facedir",32,128,is_colorfacedir_node)
-repainter_register_repainter("b","B - (color)4dir",4,32,is_color4dir_node)
-repainter_register_repainter("c","C - (color)wallmounted",8,64,is_colorwallmounted_node)
-repainter_register_repainter("d","D - (color)degrotate",32,128,is_colordegrotate_node)
+repainter_register_repainter("a","A - (color)facedir",32,128,24,is_colorfacedir_node)
+repainter_register_repainter("b","B - (color)4dir",4,32,4,is_color4dir_node)
+repainter_register_repainter("c","C - (color)wallmounted",8,64,6,is_colorwallmounted_node)
+repainter_register_repainter("d","D - (color)degrotate",32,128,24,is_colordegrotate_node)
 
 --rotator_register_rotator(rtype,rrtype,num1,num2,funk)
-repainter_register_rotator("a","A - facedir",32,4,is_facedir_node)
-repainter_register_rotator("b","B - 4dir",4,1,is_4dir_node)
-repainter_register_rotator("c","C - wallmounted",8,1,is_wallmounted_node)
-repainter_register_rotator("d","D - degrotate",32,8,is_degrotate_node)
-
+repainter_register_rotator("a","A - facedir",32,4,24,is_facedir_node)
+repainter_register_rotator("b","B - 4dir",4,1,4,is_4dir_node)
+repainter_register_rotator("c","C - wallmounted",8,1,6,is_wallmounted_node)
+repainter_register_rotator("d","D - degrotate",32,6,24,is_degrotate_node)
