@@ -9,6 +9,8 @@ In variants:
 * C - (color)wallmounted - green
 * D - (color)degrotate - yellow
 
+* Zerotator, Zerorepainter - sets some bits of node.param2 to 0 (default color or default rotation)
+
 This mod does not include any palette, it uses palettes specified for each node.
 
 Crafting actually supported for Mineclonia and Minetest game based games
