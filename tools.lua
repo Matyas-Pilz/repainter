@@ -1,52 +1,72 @@
+-- COLOR CONFIGURATION
+-- thanks to bgstack15
+--
+has_xcompat = core.get_modpath("xcompat") ~= nil
+has_mcl_core = core.get_modpath("mcl_core") ~= nil
+has_default = core.get_modpath("default") ~= nil
+-- color configuration
+local color_assignment = {
+    a = "blue",
+    b = "red",
+    c = "green",
+    d = "yellow"
+}
+local wool_name
+if has_mcl_core then
+    wool_name = "mcl_wool:"
+else
+    wool_name = "wool:"
+end
+
 -- LOCAL FUNCTIONS
 --
 local function is_colorfacedir_node(pos)
-    local node = minetest.get_node_or_nil(pos)
+    local node = core.get_node_or_nil(pos)
     if not node then return false end
-    local def = minetest.registered_nodes[node.name]
+    local def = core.registered_nodes[node.name]
     return def and def.paramtype2 == "colorfacedir"
 end
 
 local function is_facedir_node(pos)
-    local node = minetest.get_node_or_nil(pos)
+    local node = core.get_node_or_nil(pos)
     if not node then return false end
-    local def = minetest.registered_nodes[node.name]
+    local def = core.registered_nodes[node.name]
     return def and def.paramtype2 == "facedir" or def.paramtype2 == "colorfacedir"
 end
 local function is_color4dir_node(pos)
-    local node = minetest.get_node_or_nil(pos)
+    local node = core.get_node_or_nil(pos)
     if not node then return false end
-    local def = minetest.registered_nodes[node.name]
+    local def = core.registered_nodes[node.name]
     return def and def.paramtype2 == "color4dir"
 end
 local function is_4dir_node(pos)
-    local node = minetest.get_node_or_nil(pos)
+    local node = core.get_node_or_nil(pos)
     if not node then return false end
-    local def = minetest.registered_nodes[node.name]
+    local def = core.registered_nodes[node.name]
     return def and def.paramtype2 == "4dir" or def.paramtype2 == "color4dir"
 end
 local function is_colorwallmounted_node(pos)
-    local node = minetest.get_node_or_nil(pos)
+    local node = core.get_node_or_nil(pos)
     if not node then return false end
-    local def = minetest.registered_nodes[node.name]
+    local def = core.registered_nodes[node.name]
     return def and def.paramtype2 == "colorwallmounted"
 end
 local function is_wallmounted_node(pos)
-    local node = minetest.get_node_or_nil(pos)
+    local node = core.get_node_or_nil(pos)
     if not node then return false end
-    local def = minetest.registered_nodes[node.name]
+    local def = core.registered_nodes[node.name]
     return def and def.paramtype2 == "wallmounted" or def.paramtype2 == "colorwallmounted"
 end
 local function is_colordegrotate_node(pos)
-    local node = minetest.get_node_or_nil(pos)
+    local node = core.get_node_or_nil(pos)
     if not node then return false end
-    local def = minetest.registered_nodes[node.name]
+    local def = core.registered_nodes[node.name]
     return def and def.paramtype2 == "colordegrotate"
 end
 local function is_degrotate_node(pos)
-    local node = minetest.get_node_or_nil(pos)
+    local node = core.get_node_or_nil(pos)
     if not node then return false end
-    local def = minetest.registered_nodes[node.name]
+    local def = core.registered_nodes[node.name]
     return def and def.paramtype2 == "degrotate" or def.paramtype2 == "colordegrotate"
 end
 
@@ -54,76 +74,113 @@ repainter_tool_defs = {}
 --
 -- FUNCTION REGISTRATION
 -- 
-function repainter_register_repainter(rtype,rrtype,num1,num2,funk)
-minetest.register_tool("repainter:repainter_"..rtype, {
-    description = "Repainter "..rrtype,
-    inventory_image = "repainter_repainter_"..rtype..".png",
-
-    on_use = function(itemstack, user, pointed_thing)
-        if pointed_thing.type ~= "node" then return itemstack end
-        local pos = pointed_thing.under
-        if not funk or not funk(pos) then return itemstack end
-
-        local node = minetest.get_node(pos)
-        node.param2 = (node.param2 + num1) % 256
-        minetest.swap_node(pos, node)
-
-        return itemstack
-    end,
-
-    on_place = function(itemstack, user, pointed_thing)
-        if pointed_thing.type ~= "node" then return itemstack end
-        local pos = pointed_thing.under
-        if not funk or not funk(pos) then return itemstack end
-
-        local node = minetest.get_node(pos)
-        node.param2 = (node.param2 + num2) % 256
-        minetest.swap_node(pos, node)
-
-        return itemstack
-    end,
-    table.insert(repainter_tool_defs, {
-        tooltype = "repainter",
-        rtype = rtype,
-        color = rtype,
-    })
+function repainter_register_repainter(rtype,rrtype,num1,num2,num3,funk)
+    core.register_tool("repainter:repainter_"..rtype, {
+        description = "Repainter "..rrtype,
+        inventory_image = "repainter_repainter_"..rtype..".png",
+    
+        on_use = function(itemstack, user, pointed_thing)
+            if pointed_thing.type ~= "node" then return itemstack end
+            local pos = pointed_thing.under
+            if not funk or not funk(pos) then return itemstack end
+    
+            local node = core.get_node(pos)
+            node.param2 = (node.param2 + num1) % 256
+            core.swap_node(pos, node)
+    
+            return itemstack
+        end,
+    
+        on_place = function(itemstack, user, pointed_thing)
+            if pointed_thing.type ~= "node" then return itemstack end
+            local pos = pointed_thing.under
+            if not funk or not funk(pos) then return itemstack end
+    
+            local node = core.get_node(pos)
+            node.param2 = (node.param2 + num2) % 256
+            core.swap_node(pos, node)
+    
+            return itemstack
+        end,
+        table.insert(repainter_tool_defs, {
+            tooltype = "repainter",
+            rtype = rtype,
+            color = rtype,
         })
+    })
+
+	-- crafting by bgstack15
+	if has_xcompat then
+		core.register_craft({
+			output = "repainter:repainter_"..rtype,
+			recipe = {
+				{ wool_name..color_assignment[rtype] },
+				{ xcompat.materials["steel_ingot"] },
+				{ xcompat.materials["stick"] }
+			}
+		})
+	elseif has_mcl_core then
+		core.register_craft({
+			output = "repainter:repainter_"..rtype,
+			recipe = {
+				{ "mcl_wool:"..color_assignment[rtype] },
+				{ "mcl_core:iron_ingot" },
+				{ "group:stick" }
+			}
+		})
+	else
+		-- default
+		core.register_craft({
+			output = "repainter:repainter_"..rtype,
+			recipe = {
+				{ "wool:"..color_assignment[rtype] },
+				{ "default:steel_ingot" },
+				{ "default:stick" }
+			}
+		})
+	end
 end
 
 function repainter_register_rotator(rtype,rrtype,num1,num2,funk)
-minetest.register_tool("repainter:rotator_"..rtype, {
-    description = "Rotator "..rrtype,
-    inventory_image = "repainter_rotator_"..rtype..".png",
-
-    on_use = function(itemstack, user, pointed_thing)
-        if pointed_thing.type ~= "node" then return itemstack end
-        local pos = pointed_thing.under
-        if not funk or not funk(pos) then return itemstack end
-
-        local node = minetest.get_node(pos)
-        node.param2 = (node.param2 + 1) % num1 + math.floor(node.param2 / num1) * num1
-        minetest.swap_node(pos, node)
-
-        return itemstack
-    end,
-
-    on_place = function(itemstack, user, pointed_thing)
-        if pointed_thing.type ~= "node" then return itemstack end
-        local pos = pointed_thing.under
-        if not funk or not funk(pos) then return itemstack end
-
-        local node = minetest.get_node(pos)
-        node.param2 = (node.param2 + num2) % num1 + math.floor(node.param2 / num1) * num1
-        minetest.swap_node(pos, node)
-
-        return itemstack
-    end,
-    table.insert(repainter_tool_defs, {
-        tooltype = "repainter",
-        rtype = rtype,
-        color = rtype,
-    })
+    core.register_tool("repainter:rotator_"..rtype, {
+        description = "Rotator "..rrtype,
+        inventory_image = "repainter_rotator_"..rtype..".png",
+    
+        on_use = function(itemstack, user, pointed_thing)
+            if pointed_thing.type ~= "node" then return itemstack end
+            local pos = pointed_thing.under
+            if not funk or not funk(pos) then return itemstack end
+    
+            local node = core.get_node(pos)
+			local node = core.get_node(pos)
+			local op2 = node.param2
+			local np2 = (((op2 % num1) + 1) % num3) + (op2 - (op2 % num1))
+            core.swap_node(pos, node)
+    
+            return itemstack
+        end,
+    
+        on_place = function(itemstack, user, pointed_thing)
+            if pointed_thing.type ~= "node" then return itemstack end
+            local pos = pointed_thing.under
+            if not funk or not funk(pos) then return itemstack end
+    
+            local node = core.get_node(pos)
+			local op2 = node.param2
+			local np2 = (((op2 % num1) + num2) % num3) + (op2 - (op2 % num1))
+			node.param2 = np2
+            core.swap_node(pos, node)
+    
+            return itemstack
+        end,
+        table.insert(repainter_tool_defs, {
+            tooltype = "repainter",
+            rtype = rtype,
+            color = rtype,
         })
+    })
+
+    
 end
 
 --
