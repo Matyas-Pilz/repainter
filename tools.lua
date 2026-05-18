@@ -1,25 +1,7 @@
--- COLOR CONFIGURATION
--- thanks to bgstack15
---
-has_xcompat = core.get_modpath("xcompat") ~= nil
-has_mcl_core = core.get_modpath("mcl_core") ~= nil
-has_default = core.get_modpath("default") ~= nil
--- color configuration
-local color_assignment = {
-    a = "blue",
-    b = "red",
-    c = "green",
-    d = "yellow"
-}
-local wool_name
-if has_mcl_core then
-    wool_name = "mcl_wool:"
-else
-    wool_name = "wool:"
-end
-
 -- LOCAL FUNCTIONS
 --
+local S = core.get_translator("repainter")
+
 local function is_colorfacedir_node(pos)
     local node = core.get_node_or_nil(pos)
     if not node then return false end
@@ -81,6 +63,7 @@ function repainter_register_repainter(rtype,rrtype,num1,num2,num3,funk)
         on_use = function(itemstack, user, pointed_thing)
             if pointed_thing.type ~= "node" then return itemstack end
             local pos = pointed_thing.under
+			if is_node_repaintable and is_node_repaintable(pos) then core.chat_send_player(user:get_player_name(),S("Unrepaintable node")) return end
             if not funk or not funk(pos) then return itemstack end
     
             local node = core.get_node(pos)
@@ -93,7 +76,8 @@ function repainter_register_repainter(rtype,rrtype,num1,num2,num3,funk)
         on_place = function(itemstack, user, pointed_thing)
             if pointed_thing.type ~= "node" then return itemstack end
             local pos = pointed_thing.under
-            if not funk or not funk(pos) then return itemstack end
+            if is_node_repaintable and is_node_repaintable(pos) then core.chat_send_player(user:get_player_name(),S("Unrepaintable node")) return end
+			if not funk or not funk(pos) then return itemstack end
     
             local node = core.get_node(pos)
             node.param2 = (node.param2 + num2) % 256
@@ -107,37 +91,6 @@ function repainter_register_repainter(rtype,rrtype,num1,num2,num3,funk)
             color = rtype,
         })
     })
-
-	-- crafting by bgstack15
-	if has_xcompat then
-		core.register_craft({
-			output = "repainter:repainter_"..rtype,
-			recipe = {
-				{ wool_name..color_assignment[rtype] },
-				{ xcompat.materials["steel_ingot"] },
-				{ xcompat.materials["stick"] }
-			}
-		})
-	elseif has_mcl_core then
-		core.register_craft({
-			output = "repainter:repainter_"..rtype,
-			recipe = {
-				{ "mcl_wool:"..color_assignment[rtype] },
-				{ "mcl_core:iron_ingot" },
-				{ "group:stick" }
-			}
-		})
-	else
-		-- default
-		core.register_craft({
-			output = "repainter:repainter_"..rtype,
-			recipe = {
-				{ "wool:"..color_assignment[rtype] },
-				{ "default:steel_ingot" },
-				{ "default:stick" }
-			}
-		})
-	end
 end
 
 function repainter_register_rotator(rtype,rrtype,num1,num2,num3,funk)
@@ -148,7 +101,8 @@ function repainter_register_rotator(rtype,rrtype,num1,num2,num3,funk)
         on_use = function(itemstack, user, pointed_thing)
             if pointed_thing.type ~= "node" then return itemstack end
             local pos = pointed_thing.under
-            if not funk or not funk(pos) then return itemstack end
+            if is_node_rotatable and is_node_rotatable(pos) then core.chat_send_player(user:get_player_name(),S("Unrotatable node")) return end
+			if not funk or not funk(pos) then return itemstack end
     
             local node = core.get_node(pos)
 			local node = core.get_node(pos)
@@ -162,7 +116,8 @@ function repainter_register_rotator(rtype,rrtype,num1,num2,num3,funk)
         on_place = function(itemstack, user, pointed_thing)
             if pointed_thing.type ~= "node" then return itemstack end
             local pos = pointed_thing.under
-            if not funk or not funk(pos) then return itemstack end
+			if is_node_rotatable and is_node_rotatable(pos) then core.chat_send_player(user:get_player_name(),S("Unrotatable node")) return end
+	        if not funk or not funk(pos) then return itemstack end
     
             local node = core.get_node(pos)
 			local op2 = node.param2
@@ -178,37 +133,6 @@ function repainter_register_rotator(rtype,rrtype,num1,num2,num3,funk)
             color = rtype,
         })
     })
-
-	-- crafting by bgstack15
-	if has_xcompat then
-    core.register_craft({
-        output = "repainter:rotator_"..rtype,
-        recipe = {
-            { xcompat.materials["steel_ingot"] },
-            { wool_name..color_assignment[rtype] },
-            { xcompat.materials["steel_ingot"] }
-        }
-    })
-	elseif has_mcl_core then
-		core.register_craft({
-			output = "repainter:rotator_"..rtype,
-			recipe = {
-				{ "mcl_core:iron_ingot" },
-				{ "mcl_wool:"..color_assignment[rtype] },
-				{ "mcl_core:iron_ingot" }
-			}
-		})
-	else
-		-- default
-		core.register_craft({
-			output = "repainter:rotator_"..rtype,
-			recipe = {
-				{ "default:steel_ingot" },
-				{ "wool:"..color_assignment[rtype] },
-				{ "default:steel_ingot" }
-			}
-		})
-	end
 end
 
 -- --------
@@ -225,6 +149,7 @@ core.register_tool("repainter:zerorepainter", {
 		local node = core.get_node_or_nil(pos)
 		if not node then return false end
 		local def = core.registered_nodes[node.name]
+		if is_node_repaintable and is_node_repaintable(pos) then core.chat_send_player(user:get_player_name(),S("Unrepaintable node")) return end
 		local op2 = node.param2
 		local np2
 		
@@ -252,6 +177,7 @@ core.register_tool("repainter:zerotator", {
 		local node = core.get_node_or_nil(pos)
 		if not node then return false end
 		local def = core.registered_nodes[node.name]
+		if is_node_rotatable and is_node_rotatable(pos) then core.chat_send_player(user:get_player_name(),S("Unrotatable node")) return end
 		local op2 = node.param2
 		local np2
 
