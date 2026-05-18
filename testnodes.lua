@@ -1,0 +1,2 @@
+core.register_node("repainter:testnode_repaint",{description="repainter:testnode_repaint",tiles={"repainter_testnode_1.png"},paramtype2="colorfacedir",palette="repainter_testp.png",groups={repainter_not_repaintable = 1}})
+core.register_node("repainter:testnode_rotate",{description="repainter:testnode_rotate",tiles={"repainter_testnode_2.png"},paramtype2="colorfacedir",palette="repainter_testp.png",groups={repainter_not_rotatable = 1}})
